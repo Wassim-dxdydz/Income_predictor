@@ -14,9 +14,17 @@ import configparser
 import pandas as pd
 from PIL import Image, ImageTk
 from sklearn.model_selection import train_test_split
-sys.path.append(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-)
+
+def get_base_dir():
+    """Get the base directory, supporting both normal execution and PyInstaller bundles."""
+    if getattr(sys, 'frozen', False):
+        return os.path.dirname(sys.executable)
+    else:
+        return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+BASE_DIR = get_base_dir()
+sys.path.append(BASE_DIR)
+
 from Library.data_utils import load_and_clean_data, inspect_data, split_features_target
 from Scripts.model_utils import (
     build_model_pipeline, train_model, evaluate_model,
@@ -30,9 +38,8 @@ from Library.plot_utils import (
     plot_education_vs_income, plot_occupation_vs_income_heatmap,
     plot_correlation_heatmap)
 
-CONFIG_PATH = "config.ini"
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CSV_PATH = os.path.join(BASE_DIR, "DATA", "adult.csv")
+CONFIG_PATH = os.path.join(BASE_DIR, "Scripts", "config.ini")
+CSV_PATH = os.path.join(BASE_DIR, "Data", "adult.csv")
 
 FONT_FAMILY = FONT_SIZE = SIDEBAR_FONT_SIZE = None
 REPORT_BUTTON_COLOR = BUTTON_COLOR = None
@@ -617,11 +624,12 @@ def launch_gui():
     root.geometry('900x600')
     root.title('Tkinter Income Predictor')
 
-    toggle_icon = tk.PhotoImage(file='images/open_menu.png')
-    close_icon = tk.PhotoImage(file='images/close_menu.png')
-    data_icon = tk.PhotoImage(file='images/data.png')
-    visualization_icon = tk.PhotoImage(file='images/visualization.png')
-    config_icon = tk.PhotoImage(file='images/configuration.png')
+    image_dir = os.path.join(BASE_DIR, "Scripts", "images")
+    toggle_icon = tk.PhotoImage(file=os.path.join(image_dir, 'open_menu.png'))
+    close_icon = tk.PhotoImage(file=os.path.join(image_dir, 'close_menu.png'))
+    data_icon = tk.PhotoImage(file=os.path.join(image_dir, 'data.png'))
+    visualization_icon = tk.PhotoImage(file=os.path.join(image_dir, 'visualization.png'))
+    config_icon = tk.PhotoImage(file=os.path.join(image_dir, 'configuration.png'))
 
     def switcher(ind, page, pg):
         """Switch between sidebar buttons and load respective page."""
