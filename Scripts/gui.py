@@ -619,7 +619,11 @@ def configuration_page(page_frame):
         )
 
         if getattr(sys, 'frozen', False):
-            subprocess.Popen([sys.executable])
+            # For Windows, use DETACHED_PROCESS to ensure the new process is independent
+            if sys.platform == "win32":
+                subprocess.Popen([sys.executable], creationflags=subprocess.DETACHED_PROCESS)
+            else:
+                subprocess.Popen([sys.executable])
             sys.exit()
         else:
             python = sys.executable
