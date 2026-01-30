@@ -31,6 +31,7 @@ jobs:
         run: |
           cd Scripts
           pyinstaller --onefile --windowed `
+            --paths ".." `
             --add-data "..\Data;Data" `
             --add-data "images;images" `
             --add-data "config.ini;." `
