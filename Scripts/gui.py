@@ -30,9 +30,34 @@ from Library.plot_utils import (
     plot_education_vs_income, plot_occupation_vs_income_heatmap,
     plot_correlation_heatmap)
 
-CONFIG_PATH = "config.ini"
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CSV_PATH = os.path.join(BASE_DIR, "DATA", "adult.csv")
+def resource_path(relative_path: str) -> str:
+    """
+    Absolute path to bundled resource (PyInstaller) or project resource (dev).
+    relative_path should use forward slashes or os.path.join parts like: "Data/adult.csv"
+    """
+    if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+        base_path = sys._MEIPASS
+    else:
+        # project root (one level up from Scripts/)
+        base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    return os.path.join(base_path, relative_path)
+
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+CSV_PATH = resource_path(os.path.join("Data", "adult.csv"))
+
+def writable_config_path() -> str:
+    """
+    Store config.ini in a user-writable location when running as EXE.
+    """
+    if getattr(sys, "frozen", False):
+        app_dir = os.path.join(os.environ.get("APPDATA", os.path.expanduser("~")), "IncomePredictor")
+        os.makedirs(app_dir, exist_ok=True)
+        return os.path.join(app_dir, "config.ini")
+    # dev mode: use Scripts/config.ini
+    return os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), "Scripts", "config.ini")
+
+CONFIG_PATH = writable_config_path()
+
 
 FONT_FAMILY = FONT_SIZE = SIDEBAR_FONT_SIZE = None
 REPORT_BUTTON_COLOR = BUTTON_COLOR = None
@@ -77,16 +102,6 @@ def _graphics_output_dir():
         os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
         'Work', 'Graphics'
     )
-
-def resource_path(relative_path):
-    """ Get absolute path to resource, works for dev and for PyInstaller """
-    try:
-        # PyInstaller creates a temp folder and stores path in _MEIPASS
-        base_path = sys._MEIPASS
-    except Exception:
-        # Not in a bundle, so we are in the 'Scripts' directory
-        base_path = os.path.abspath(os.path.dirname(__file__))
-    return os.path.join(base_path, relative_path)
 
 def data_page(page_frame):
     """Creates the Data tab with Load & Clean Data functionality only."""
