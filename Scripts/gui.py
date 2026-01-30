@@ -6,6 +6,7 @@ User-configurable via a separate INI file for theming and behavior.
 
 import io
 import os
+import subprocess
 import sys
 import threading
 import tkinter as tk
@@ -617,8 +618,12 @@ def configuration_page(page_frame):
             "Configuration saved. The application will now restart."
         )
 
-        python = sys.executable
-        os.execl(python, python, *sys.argv)
+        if getattr(sys, 'frozen', False):
+            subprocess.Popen([sys.executable])
+            sys.exit()
+        else:
+            python = sys.executable
+            os.execl(python, python, *sys.argv)
 
     save_btn = tk.Button(
         configuration_page_frame,
