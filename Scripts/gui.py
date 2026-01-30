@@ -78,6 +78,16 @@ def _graphics_output_dir():
         'Work', 'Graphics'
     )
 
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        # Not in a bundle, so we are in the 'Scripts' directory
+        base_path = os.path.abspath(os.path.dirname(__file__))
+    return os.path.join(base_path, relative_path)
+
 def data_page(page_frame):
     """Creates the Data tab with Load & Clean Data functionality only."""
     # === Frame setup ===
@@ -617,11 +627,11 @@ def launch_gui():
     root.geometry('900x600')
     root.title('Tkinter Income Predictor')
 
-    toggle_icon = tk.PhotoImage(file='images/open_menu.png')
-    close_icon = tk.PhotoImage(file='images/close_menu.png')
-    data_icon = tk.PhotoImage(file='images/data.png')
-    visualization_icon = tk.PhotoImage(file='images/visualization.png')
-    config_icon = tk.PhotoImage(file='images/configuration.png')
+    toggle_icon = tk.PhotoImage(file=resource_path('images/open_menu.png'))
+    close_icon = tk.PhotoImage(file=resource_path('images/close_menu.png'))
+    data_icon = tk.PhotoImage(file=resource_path('images/data.png'))
+    visualization_icon = tk.PhotoImage(file=resource_path('images/visualization.png'))
+    config_icon = tk.PhotoImage(file=resource_path('images/configuration.png'))
 
     def switcher(ind, page, pg):
         """Switch between sidebar buttons and load respective page."""
